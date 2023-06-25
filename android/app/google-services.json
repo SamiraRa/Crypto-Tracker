@@ -1,0 +1,76 @@
+{
+  "project_info": {
+    "project_number": "642915802728",
+    "project_id": "flutter-firebase-4617a",
+    "storage_bucket": "flutter-firebase-4617a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:642915802728:android:8e474142c222928295e5dd",
+        "android_client_info": {
+          "package_name": "com.example.crypto_tracking_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "642915802728-kabase1929ui4j70okg9df3u23920t91.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDqct-MRFTX_ADx7awTX9mStaHspT44_IU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "642915802728-kabase1929ui4j70okg9df3u23920t91.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:642915802728:android:d9b04480e1b1ae7795e5dd",
+        "android_client_info": {
+          "package_name": "com.example.guruji"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "642915802728-5sr61b0nk2ego7v9fouvui3fpqel4s2t.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.guruji",
+            "certificate_hash": "1624f95c486bda7d7b722c7f433a355b592d204d"
+          }
+        },
+        {
+          "client_id": "642915802728-kabase1929ui4j70okg9df3u23920t91.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDqct-MRFTX_ADx7awTX9mStaHspT44_IU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "642915802728-kabase1929ui4j70okg9df3u23920t91.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
