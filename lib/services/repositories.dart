@@ -11,7 +11,7 @@ class Repositories {
       String start, String limit, String convert) async {
     LatestCoin latestCoinData;
     Map<String, dynamic> a = {};
-    // Timer.periodic(Duration(seconds: 3), (timer) async {
+
     try {
       http.Response response =
           await DataProviders().latestCoinDP(start, limit, convert);
@@ -20,32 +20,27 @@ class Repositories {
       latestCoinData = latestCoinFromJson(response.body);
 
       if (response.statusCode == 200) {
-        print(latestCoinData.data.first.name);
         final FirebaseFirestore firestore = FirebaseFirestore.instance;
         CollectionReference collectionRef =
             firestore.collection('cryptoCurrency');
-        for (var data in a["data"]) {
-          await collectionRef.add(data);
+        List datum = a["data"];
+
+        for (var data in datum) {
+          final document = collectionRef.doc(data['id'].toString());
+          final documentSnapshot = await document.get();
+
+          if (documentSnapshot.exists) {
+            await document.update(data);
+          } else {
+            await document.set(data);
+          }
         }
-
-        // final docUser = FirebaseFirestore.instance
-        //     .collection("cryptoCurrency")
-        //     .doc(DateTime.now().toString());
-
-        // docUser.set({
-        //   "data": latestCoinData.data,
-        // });
-
-        // final box = Boxes.getUserData();
-        // userData.email = emailAddress;
-        // box.put('loginData', userData);
-        // return userData;
       }
     } on Exception catch (e) {
       print(e);
       throw Exception(e);
     }
-    // });
+
     return latestCoinData;
   }
 }

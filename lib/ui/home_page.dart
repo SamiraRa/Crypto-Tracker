@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:crypto_tracking_app/models/coin_data.dart';
+import 'package:crypto_tracking_app/services/repositories.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -16,145 +18,80 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    readData();
-    print(latestCoinData.length);
+    callingApi();
   }
 
-  // callingApi() async {
-  //   // Timer.periodic(Duration(minutes: 14), (timer) async {
+  callingApi() async {
+    await Repositories().latestCoinRepo("1", "200", "BDT");
+    setState(() {});
+  }
 
-  //   latestCoinData = await Repositories().latestCoinRepo("1", "200", "BDT");
-  //   setState(() {});
-  //   print(latestCoinData!.data);
-  //   // });
-  // }
-
-  //  retrieveData() async {
-  //   try {
-  //     final FirebaseFirestore firestore = FirebaseFirestore.instance;
-  //     // Create a Firestore collection reference
-  //     CollectionReference collectionRef =
-  //         firestore.collection('cryptoCurrency');
-
-  //     // Retrieve the documents from the collection
-  //     QuerySnapshot querySnapshot = await collectionRef.get();
-
-  //     // Loop through the documents and access the data
-  //     for (QueryDocumentSnapshot documentSnapshot in querySnapshot.docs) {
-  //       // Access the document data as a Map
-  //       print(documentSnapshot.data());
-  //       if (documentSnapshot.exists) {
-  //       return  CoinData.fromJson(documentSnapshot.data());
-  //       }
-
-  //     }
-  //   } catch (e) {
-  //     print('Error retrieving data: $e');
-  //   }
-  // }
-
-  Stream<List<CoinData>> readData() => FirebaseFirestore.instance
-          .collection("cryptoCurrency")
-          .snapshots()
-          .map((event) {
-        print(event.docs.first.id);
-        return event.docs.map((e) => CoinData.fromJson(e.data())).toList();
-      });
-
-// latestCoinData == null
-//               ? const Center(child: CircularProgressIndicator())
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: StreamBuilder<QuerySnapshot>(
+      backgroundColor: const Color.fromARGB(255, 33, 18, 59),
+      body: StreamBuilder(
           stream: FirebaseFirestore.instance
               .collection("cryptoCurrency")
+              .orderBy("cmc_rank", descending: true)
               .snapshots(),
           builder: (context, AsyncSnapshot snapshot) {
             if (snapshot.hasData) {
               final coinData = snapshot.data?.docs
                   .map((e) => CoinData.fromJson(e.data()))
                   .toList();
+              latestCoinData.clear();
               for (var b in coinData) {
                 latestCoinData.add(b);
               }
-              print(latestCoinData.length);
 
-              return
-                  // : ListView.builder(
-                  //     shrinkWrap: true,
-                  //     physics: BouncingScrollPhysics(),
-                  //     itemCount: latestCoinData!.data.length,
-                  //     itemBuilder: (context, index) {
-                  //       return Row(
-                  //         children: [
-                  //           Text(latestCoinData!.data[index].cmcRank.toString()),
-                  //           const SizedBox(
-                  //             width: 10,
-                  //           ),
-                  //           CircleAvatar(
-                  //             backgroundColor: Colors.amber[100],
-                  //             radius: 15,
-                  //             child: Text(
-                  //               latestCoinData!.data[index].symbol,
-                  //               style: const TextStyle(
-                  //                   fontSize: 8,
-                  //                   fontWeight: FontWeight.w100,
-                  //                   color: Colors.black),
-                  //             ),
-                  //           ),
-                  //           const SizedBox(
-                  //             width: 10,
-                  //           ),
-                  //           SizedBox(
-                  //             // height: MediaQuery.of(context).size.height / 4,
-                  //             child: Text(
-                  //               latestCoinData!.data[index].name,
-                  //               style: const TextStyle(
-                  //                   fontSize: 15, fontWeight: FontWeight.w400),
-                  //             ),
-                  //           ),
-                  //         ],
-                  //       );
-                  //     },
-                  //   ),
-
-                  SingleChildScrollView(
+              return SingleChildScrollView(
                 scrollDirection: Axis.vertical,
-                child: PaginatedDataTable(
-                  source:
-                      TableRow(latestCoinList: latestCoinData, refresh: () {}),
-                  header: const Text('Crypto Currency'),
-                  columns: Datacolumn(context),
-                  columnSpacing: 100,
-                  horizontalMargin: 10,
-                  rowsPerPage: 14,
-                  showCheckboxColumn: false,
+                child: Theme(
+                  data: ThemeData(
+                    primaryColor: const Color.fromARGB(255, 199, 181, 231),
+                    cardColor: Color.fromARGB(255, 193, 230, 233),
+                    textTheme: const TextTheme(
+                      headline6:
+                          TextStyle(color: Color.fromRGBO(73, 70, 70, 1)),
+                      bodyText2:
+                          TextStyle(color: Color.fromARGB(255, 90, 84, 84)),
+                      caption:
+                          TextStyle(color: Color.fromARGB(255, 71, 69, 69)),
+                    ),
+                  ),
+                  child: PaginatedDataTable(
+                    source: TableRow(
+                        latestCoinList: latestCoinData.reversed.toList(),
+                        refresh: () {
+                          setState(() {});
+                        }),
+                    header: const Text('Crypto Currency'),
+                    columns: datacolumn(context),
+                    columnSpacing: 100,
+                    horizontalMargin: 8,
+                    rowsPerPage: 14,
+                    sortAscending: false,
+                    showCheckboxColumn: false,
+                  ),
                 ),
               );
             } else if (snapshot.hasError) {
-              print(snapshot.data);
               return const Text("Something Went Wrong!");
             } else {
-              return Center(child: CircularProgressIndicator());
+              return const Center(child: CircularProgressIndicator());
             }
           }),
     );
   }
 
-  List<DataColumn> Datacolumn(BuildContext context) {
+  List<DataColumn> datacolumn(BuildContext context) {
     return <DataColumn>[
       DataColumn(
           label: Text(
         "Rank",
         style: Theme.of(context).textTheme.subtitle2,
       )),
-      DataColumn(
-        label: Text(
-          "",
-          style: Theme.of(context).textTheme.subtitle2,
-        ),
-      ),
       DataColumn(
           label: Text(
         "Name",
@@ -168,7 +105,7 @@ class _HomePageState extends State<HomePage> {
       ),
       DataColumn(
         label: Text(
-          "Date Added",
+          "Price",
           style: Theme.of(context).textTheme.subtitle2,
         ),
       ),
@@ -194,13 +131,42 @@ class TableRow extends DataTableSource {
     return DataRow.byIndex(
       index: index,
       cells: [
-        DataCell(Text((latestCoinList[index].cmcRank.toString()))),
-        DataCell(CircleAvatar(
-          child: Text(latestCoinList[index].symbol),
+        DataCell(SizedBox(
+          // width: 15,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Text((latestCoinList[index].cmcRank.toString())),
+              const SizedBox(
+                width: 20,
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 10, right: 10),
+                child: CircleAvatar(
+                  backgroundColor: Colors.amber,
+                  child: Text(
+                    latestCoinList[index].symbol,
+                    style: const TextStyle(
+                        fontSize: 10, fontWeight: FontWeight.w500),
+                  ),
+                ),
+              )
+            ],
+          ),
         )),
         DataCell(Text((latestCoinList[index].name))),
-        DataCell(Text(latestCoinList[index].lastUpdated.toString())),
-        DataCell(Text(latestCoinList[index].dateAdded.toString())),
+        DataCell(
+          latestCoinList[index].lastUpdated != ""
+              ? Text(
+                  DateFormat('EEEE, MMM d, yyyy, hh:MM').format(
+                    DateTime.parse(
+                        latestCoinList[index].lastUpdated.toString()),
+                  ),
+                )
+              : Text(""),
+        ),
+        DataCell(Text(
+            "${latestCoinList[index].quote.bdt.price.toStringAsFixed(3)}   BDT")),
         DataCell(Text(latestCoinList[index].numMarketPairs.toString())),
       ],
     );

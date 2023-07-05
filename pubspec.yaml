@@ -39,6 +39,8 @@ dependencies:
   firebase_core:
   flutter_launcher_icons:
   chart_sparkline:
+  animated_splash_screen:
+  intl:
 
 dev_dependencies:
   flutter_test:
